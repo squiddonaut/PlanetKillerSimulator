@@ -1,4 +1,4 @@
-# Planet Killer Simulator 🌍💥
+# Planet Killer Simulator
 
 A Python-based meteor impact simulator that calculates and visualizes the destructive effects of asteroid/comet strikes on major Earth cities.
 
@@ -151,22 +151,3 @@ The simulator includes 20 major world cities across all continents:
 - Does not model seismic effects or tsunamis
 - Destruction zones are approximations based on energy scaling
 
-## Educational Purpose
-
-This simulator is designed for educational purposes to understand the physics of meteor impacts. The calculations are based on simplified models and should not be used for actual hazard assessment.
-
-## License
-
-This project is open source and available for educational use.
-
-## Contributing
-
-Contributions are welcome! Feel free to submit issues or pull requests to improve the simulator.
-
-## Disclaimer
-
-⚠️ **This is a simulation for educational purposes only.** The results are approximations based on simplified physics models. Do not use this for actual impact hazard assessment or emergency planning.
-
----
-
-**Remember**: While meteor impacts are a real concern, the probability of a large impact in any given year is extremely low. NASA and other space agencies actively track near-Earth objects to provide early warning of potential threats.
