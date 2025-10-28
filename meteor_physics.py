@@ -172,3 +172,91 @@ class ImpactCalculator:
             'crater_diameter_m': crater_diameter,
             'destruction_zones': destruction_radii
         }
+
+# Add this function to meteor_physics.py
+
+import math
+
+def calculate_casualties(destruction_zones, city_density):
+    """
+    Calculate estimated casualties based on destruction zones and city population density.
+    
+    Args:
+        destruction_zones: dict with keys 'fireball', 'total_destruction', 
+                          'severe_damage', 'moderate_damage', 'light_damage' (radii in km)
+        city_density: population density in people per km²
+    
+    Returns:
+        dict with casualty estimates for each zone
+    """
+    
+    def calculate_zone_area(outer_radius, inner_radius=0):
+        """Calculate area of an annular zone."""
+        return math.pi * (outer_radius**2 - inner_radius**2)
+    
+    # Mortality rates for each zone
+    mortality_rates = {
+        'fireball': 1.00,           # 100% fatality
+        'total_destruction': 0.98,   # 98% fatality
+        'severe_damage': 0.70,       # 70% fatality
+        'moderate_damage': 0.30,     # 30% fatality
+        'light_damage': 0.05         # 5% fatality
+    }
+    
+    # Injury rates for survivors in each zone
+    injury_rates = {
+        'fireball': 0.00,            # No survivors to injure
+        'total_destruction': 0.95,   # 95% of survivors injured
+        'severe_damage': 0.85,       # 85% of survivors injured
+        'moderate_damage': 0.60,     # 60% of survivors injured
+        'light_damage': 0.40         # 40% of survivors injured
+    }
+    
+    zones = [
+        ('fireball', destruction_zones['fireball'], 0),
+        ('total_destruction', destruction_zones['total_destruction'], destruction_zones['fireball']),
+        ('severe_damage', destruction_zones['severe_damage'], destruction_zones['total_destruction']),
+        ('moderate_damage', destruction_zones['moderate_damage'], destruction_zones['severe_damage']),
+        ('light_damage', destruction_zones['light_damage'], destruction_zones['moderate_damage'])
+    ]
+    
+    casualties = {
+        'deaths_by_zone': {},
+        'injuries_by_zone': {},
+        'total_deaths': 0,
+        'total_injuries': 0,
+        'total_affected': 0
+    }
+    
+    for zone_name, outer_radius, inner_radius in zones:
+        # Calculate area of this zone
+        zone_area = calculate_zone_area(outer_radius, inner_radius)
+        
+        # Calculate population in this zone
+        population_in_zone = zone_area * city_density
+        
+        # Calculate deaths
+        deaths = population_in_zone * mortality_rates[zone_name]
+        casualties['deaths_by_zone'][zone_name] = int(deaths)
+        casualties['total_deaths'] += int(deaths)
+        
+        # Calculate injuries among survivors
+        survivors = population_in_zone - deaths
+        injuries = survivors * injury_rates[zone_name]
+        casualties['injuries_by_zone'][zone_name] = int(injuries)
+        casualties['total_injuries'] += int(injuries)
+        
+        casualties['total_affected'] += int(population_in_zone)
+    
+    return casualties
+
+
+def format_number(num):
+    """Format large numbers with appropriate suffixes."""
+    if num >= 1_000_000:
+        return f"{num/1_000_000:.2f} million"
+    elif num >= 1_000:
+        return f"{num/1_000:.2f} thousand"
+    else:
+        return f"{int(num)}"
+
